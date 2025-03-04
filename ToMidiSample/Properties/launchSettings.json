@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ToMidiSample": {
+      "commandName": "Project",
+      "commandLineArgs": "$(ProjectDir)\\res\\flute.wav"
+    }
+  }
+}

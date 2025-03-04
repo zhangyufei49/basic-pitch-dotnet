@@ -1,0 +1,19 @@
+{
+  // 使用 IntelliSense 了解相关属性。
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ToMidiSample Debug",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "dotnet:ToMidiSample",
+      "program": "${workspaceFolder}/ToMidiSample/bin/Debug/net8.0-windows10.0.17763.0/ToMidiSample.exe",
+      "args": ["${workspaceFolder}/ToMidiSample/res/flute.wav"],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "internalConsole"
+    }
+  ]
+}
