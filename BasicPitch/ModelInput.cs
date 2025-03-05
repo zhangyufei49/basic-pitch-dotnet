@@ -1,4 +1,4 @@
-﻿using Microsoft.AI.MachineLearning;
+﻿using Windows.AI.MachineLearning;
 using NAudio.Wave;
 using System.Diagnostics;
 

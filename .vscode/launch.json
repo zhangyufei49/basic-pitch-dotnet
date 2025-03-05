@@ -9,7 +9,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "dotnet:ToMidiSample",
-      "program": "${workspaceFolder}/ToMidiSample/bin/Debug/net8.0-windows10.0.17763.0/ToMidiSample.exe",
+      "program": "${workspaceFolder}/ToMidiSample/bin/Debug/net9.0-windows10.0.17763.0/ToMidiSample.exe",
       "args": ["${workspaceFolder}/ToMidiSample/res/flute.wav"],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
