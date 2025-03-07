@@ -39,19 +39,27 @@ class Program
 
         // 进行预测
         Log("Predicting");
+        Stopwatch sw = Stopwatch.StartNew();
         var modelOutput = model.Predict(audioBuffer, (double p) =>
         {
             Log($"====> prediction progress: {p}", ConsoleColor.DarkYellow);
         });
+        sw.Stop();
+        Console.WriteLine($"predicting time used: {sw.ElapsedMilliseconds}ms");
 
-        // 保存 midi 文件
+        // 生成音符
         Log("Convert to notes");
         var notesConverter = new NotesConverter(modelOutput);
+        sw = Stopwatch.StartNew();
         var notes = notesConverter.Convert(new NotesConvertOptions(IncludePitchBends: false));
+        sw.Stop();
+        Console.WriteLine($"convert time used: {sw.ElapsedMilliseconds}ms");
         foreach (var note in notes)
         {
             Log(note.ToString(), ConsoleColor.DarkYellow);
         }
+
+        Log("Save MIDI");
     }
 
     private static void Log(string msg, ConsoleColor color = ConsoleColor.DarkGreen)

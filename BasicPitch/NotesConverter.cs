@@ -58,6 +58,7 @@ public class NotesConverter
         var nFrames = frames.Shape!.First();
         var nFramesMinus1 = nFrames - 1;
         var energySpan = remainingEnergy.AsTensorSpan(frames.Shape);
+
         foreach (var idx in onsetIdxs)
         {
             var noteStartIdx = idx / frameStep;
@@ -280,12 +281,9 @@ public class NotesConverter
             return new List<Note>();
         }
 
-        var i = (int)(input.Contours.Shape!.First());
-        var times = NotesHelper.ModelFrameToTime(i);
-
         return notes.Select(i => new Note(
-            times[i.IStartTime],
-            times[i.IEndTime],
+            NotesHelper.ModelFrameToTime(i.IStartTime),
+            NotesHelper.ModelFrameToTime(i.IEndTime),
             i.Pitch,
             i.Amplitude,
             i.PitchBend
@@ -305,21 +303,16 @@ class NotesHelper
         return (float)(Math.Pow(2, (pitch - 69) / 12f) * 440);
     }
 
-    public static float[] ModelFrameToTime(int n)
+    public static float ModelFrameToTime(int n)
     {
-        var frames = MathTool.ARange(0f, 1f, n);
-        var oriTimes = FramesToTime(frames);
+        if (n < 1) return 0f;
 
-        TP.Divide(frames, (float)Constants.ANNOT_N_FRAMES, frames);
-        TP.Floor(new ReadOnlySpan<float>(frames), frames);
-
+        var oriTime = (n * Constants.FFT_HOP) / (float)Constants.AUDIO_SAMPLE_RATE;
         var windowOffset = (float)Constants.FFT_HOP / (float)Constants.AUDIO_SAMPLE_RATE
             * ((float)Constants.ANNOT_N_FRAMES - (float)Constants.AUDIO_N_SAMPLES / (float)Constants.FFT_HOP)
             + 0.0018f;
-
-        TP.Multiply(frames, windowOffset, frames);
-        TP.Subtract(oriTimes, frames, frames);
-        return frames;
+        var v = (float)Math.Floor(n / (float)Constants.ANNOT_N_FRAMES) * windowOffset;
+        return oriTime - v;
     }
 
     public static (Tensor, Tensor) ConstrainFrequency(in Tensor onsets, in Tensor frames, float? maxFreq, float? minFreq)
@@ -470,22 +463,6 @@ class NotesHelper
     {
         var hz = MidiToHz(pitch);
         return 12f * Constants.CONTOURS_BINS_PER_SEMITONE * (float)Math.Log2(hz / Constants.ANNOTATIONS_BASE_FREQUENCY);
-    }
-
-    private static float[] FramesToTime(in float[] frames)
-    {
-        float sr = (float)Constants.AUDIO_SAMPLE_RATE;
-        float hopLength = (float)Constants.FFT_HOP;
-        var samples = new float[frames.Length];
-
-        // frames to samples
-        TP.Multiply(frames, hopLength, samples);
-        TP.Floor(new ReadOnlySpan<float>(samples), samples);
-
-        // samples to time
-        TP.Divide(samples, sr, samples);
-
-        return samples;
     }
 
     private static void ZeroPitch(ref Tensor t, Range pitchRange)
