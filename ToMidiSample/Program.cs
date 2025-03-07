@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using BasicPitch;
+using System.Diagnostics;
 
 namespace ToMidiSample;
 
@@ -17,10 +18,10 @@ class Program
         // 加载音频
         var audioFile = args[0];
         Log($"Load audio file: ${audioFile}");
-        BasicPitch.AudioReader reader;
+        AudioReader reader;
         try
         {
-            reader = new BasicPitch.AudioReader(audioFile);
+            reader = new AudioReader(audioFile);
         }
         catch (Exception e)
         {
@@ -34,17 +35,23 @@ class Program
 
         // 模型加载
         Log("Load model");
-        var model = new BasicPitch.Model();
+        var model = new Model();
 
         // 进行预测
         Log("Predicting");
-        model.Predict(audioBuffer, (double p) =>
+        var modelOutput = model.Predict(audioBuffer, (double p) =>
         {
             Log($"====> prediction progress: {p}", ConsoleColor.DarkYellow);
         });
 
         // 保存 midi 文件
-        Log("Save MIDI");
+        Log("Convert to notes");
+        var notesConverter = new NotesConverter(modelOutput);
+        var notes = notesConverter.Convert(new NotesConvertOptions(IncludePitchBends: false));
+        foreach (var note in notes)
+        {
+            Log(note.ToString(), ConsoleColor.DarkYellow);
+        }
     }
 
     private static void Log(string msg, ConsoleColor color = ConsoleColor.DarkGreen)

@@ -5,53 +5,46 @@ namespace BasicPitch;
 public class Tensor
 {
     public readonly float[]? Data;
-    public readonly long[]? Shape;
+    public readonly nint[]? Shape;
 
-    public Tensor(List<TensorFloat> t)
+    public Tensor(float[]? data, nint[]? shape)
     {
-        if (t.Count > 0)
-        {
-            // 确定形状
-            var s = t[0].Shape;
-            this.Shape = s.ToArray();
-            this.Shape[0] = this.Shape[0] * t.Count;
-            // 确定内存大小
-            var total = t[0].GetAsVectorView().Count * t.Count;
-            this.Data = new float[total];
-            // 拷贝数据
-            int offset = 0;
-            foreach (var i in t)
-            {
-                var src = i.GetAsVectorView();
-                if (src is ICollection<float> source)
-                {
-                    source.CopyTo(this.Data, offset);
-                    offset += source.Count;
-                }
-                else
-                {
-                    foreach (var j in src)
-                    {
-                        this.Data[offset] = j;
-                        offset += 1;
-                    }
-                }
-            }
+        Data = data;
+        Shape = shape;
+    }
 
+    // 深拷贝
+    public Tensor DeepClone()
+    {
+        float[]? data = null;
+        nint[]? shape = null;
+
+        if (Data != null)
+        {
+            data = new float[Data.Length];
+            Data.CopyTo(data, 0);
         }
+
+        if (Shape != null)
+        {
+            shape = new nint[Shape.Length];
+            Shape.CopyTo(shape, 0);
+        }
+
+        return new Tensor(data, shape);
     }
 }
 
 public class ModelOutput
 {
-    public readonly Tensor contours;
-    public readonly Tensor notes;
-    public readonly Tensor onsets;
+    public readonly Tensor Contours;
+    public readonly Tensor Notes;
+    public readonly Tensor Onsets;
 
     public ModelOutput(Tensor c, Tensor n, Tensor o)
     {
-        contours = c;
-        notes = n;
-        onsets = o;
+        Contours = c;
+        Notes = n;
+        Onsets = o;
     }
 }

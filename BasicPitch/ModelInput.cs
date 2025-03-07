@@ -13,8 +13,8 @@ class ModelInput
     public ModelInput(WaveBuffer waveBuffer, ILearningModelFeatureDescriptor descriptor)
     {
         this.waveBuffer = waveBuffer;
-        this.inputInfo = new ShapeHelper(descriptor);
-        this.tensorData = new float[inputInfo.Count];
+        inputInfo = new ShapeHelper(descriptor);
+        tensorData = new float[inputInfo.Count];
     }
 
     public IEnumerable<(TensorFloat, Double)> Enumerate()
@@ -26,12 +26,12 @@ class ModelInput
 
         int n, j;
         // cursor < 0 的部分填充 0
-        this.tensorData.AsSpan().Slice(0, offset).Fill(0);
+        tensorData.AsSpan().Slice(0, offset).Fill(0);
         while (cursor < totalFrames)
         {
             j = Math.Max(0, cursor);
             n = Math.Min(inputInfo.Count - offset, totalFrames - j);
-            waveBuffer.FloatBuffer.AsSpan().Slice(j, n).CopyTo(this.tensorData.AsSpan().Slice(offset, n));
+            waveBuffer.FloatBuffer.AsSpan().Slice(j, n).CopyTo(tensorData.AsSpan().Slice(offset, n));
             offset += n;
 
             Debug.WriteLine($"ModelInput processed: [{cursor}, {cursor + inputInfo.Count}]");
@@ -44,7 +44,7 @@ class ModelInput
             else
             {
                 // 最后一次，数据不足的情况补0
-                this.tensorData.AsSpan().Slice(offset).Fill(0);
+                tensorData.AsSpan().Slice(offset).Fill(0);
                 yield return CreateResult(1.0);
             }
             offset = 0;
@@ -65,12 +65,12 @@ class ShapeHelper
         var featureDescriptor = (descriptor as TensorFeatureDescriptor)!;
         var shape = featureDescriptor.Shape;
 
-        this.Shape = new long[shape.Count];
+        Shape = new long[shape.Count];
         for (int i = 0; i < shape.Count; i++)
         {
             // abs 解决负数的问题
             var n = Math.Abs(shape[i]);
-            this.Shape[i] = n;
+            Shape[i] = n;
             Count *= (int)n;
         }
     }
