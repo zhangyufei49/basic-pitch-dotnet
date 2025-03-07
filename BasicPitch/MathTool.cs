@@ -45,9 +45,9 @@ class MathTool
         return data;
     }
 
-    public static T Mean<T>(in ReadOnlySpan<T> data, int skip, int step, int length) where T : IAdditionOperators<T, T, T>, IAdditiveIdentity<T, T>
+    public static float Mean(in float[] data, int skip, int step, int length)
     {
-        dynamic sum = default(T)!;
+        float sum = 0;
         if (length <= 0) return sum;
 
         for (int i = 0; i < length; ++i)

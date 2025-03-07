@@ -92,20 +92,24 @@ public class NotesConverter
             }
 
             // 清空子矩阵
-            var colLeft = freqIdx;
-            var colRight = freqIdx + 1;
-            if (freqIdx < Constants.MAX_FREQ_IDX)
-            {
-                colRight += 1;
-            }
-            if (freqIdx > 0)
-            {
-                colLeft -= 1;
-            }
-            energySpan.Slice([noteStartIdx..i, colLeft..colRight]).Clear();
-
             // 求 idx 开始到最后一行的那一列中数据的平均值当作 amplitude
-            var amplitude = MathTool.Mean<float>(frameData, idx, frameStep, i - noteStartIdx);
+            // 这里使用一个循环来完成这一切是为了优化性能
+            float amplitude = 0;
+            for (var j = 0; j < (i - noteStartIdx); ++j)
+            {
+                var offset = idx + j * frameStep;
+                amplitude += frameData[offset];
+                remainingEnergy[offset] = 0;
+                if (freqIdx < Constants.MAX_FREQ_IDX)
+                {
+                    remainingEnergy[offset + 1] = 0;
+                }
+                if (freqIdx > 0)
+                {
+                    remainingEnergy[offset - 1] = 0;
+                }
+            }
+            amplitude /= (i - noteStartIdx);
             notes.Add(new InterNote(noteStartIdx, i, freqIdx + Constants.MIDI_OFFSET, amplitude));
         }
 
@@ -199,7 +203,7 @@ public class NotesConverter
                     continue;
                 }
 
-                amplitude = MathTool.Mean<float>(frameData, iStart * frameStep + freqIdx, frameStep, iLen);
+                amplitude = MathTool.Mean(frameData, iStart * frameStep + freqIdx, frameStep, iLen);
                 notes.Add(new InterNote(iStart, iEnd, freqIdx + Constants.MIDI_OFFSET, amplitude));
             }
         }
