@@ -19,7 +19,8 @@ public sealed class Note : IComparable<Note>
 
     public override string ToString()
     {
-        return $"start: {StartTime}, end: {EndTime}, pitch: {Pitch}, amplitude: {Amplitude}, bend: [{string.Join(",", PitchBend ?? [])}]";
+        var nbend = PitchBend != null ? PitchBend!.Length : 0;
+        return $"start: {StartTime}, end: {EndTime}, pitch: {Pitch}, amplitude: {Amplitude}, bend: ${nbend}[{string.Join(",", PitchBend ?? [])}]";
     }
 
     public int CompareTo(Note? other)

@@ -1,5 +1,4 @@
-﻿using System.Collections.Specialized;
-using System.Numerics.Tensors;
+﻿using System.Numerics.Tensors;
 
 namespace BasicPitch;
 
@@ -208,7 +207,69 @@ public class NotesConverter
 
     private void GetPitchBend(ref IList<InterNote> notes, int nBinsTolerance = 25)
     {
-        // TODO:
+        if (input.Contours.Data == null || notes.Count == 0) return;
+        var contourSpan = input.Contours.Data!.AsSpan();
+        var contourStep = (int)input.Contours.Shape!.Last();
+
+        var windowLen = nBinsTolerance * 2 + 1;
+        var freqGaussianSpan = NotesHelper.MakeGaussianWindow(windowLen, 5).AsSpan();
+        int freqIdx;
+        int freqStartIdx;
+        int freqEndIdx;
+        int gaussianIdxStart;
+        int gaussianIdxEnd;
+        int cols;
+        int rows;
+        float pbShift;
+        float maxValue = 0;
+        int maxIdx = 0;
+        int mulLength;
+
+        var pitchBendSubMatrix = new float[Constants.N_FREQ_BINS_CONTOURS];
+        var bends = new List<float>();
+        foreach (InterNote note in notes)
+        {
+            freqIdx = (int)Math.Round(NotesHelper.MidiPitchToContourBin(note.Pitch));
+            freqStartIdx = Math.Max(freqIdx - nBinsTolerance, 0);
+            freqEndIdx = Math.Min(Constants.N_FREQ_BINS_CONTOURS, freqIdx + nBinsTolerance + 1);
+
+            rows = note.IEndTime - note.IStartTime;
+            cols = freqEndIdx - freqStartIdx;
+            if (pitchBendSubMatrix.Length < cols)
+            {
+                pitchBendSubMatrix = new float[cols];
+            }
+            pitchBendSubMatrix.AsSpan().Fill(float.MinValue);
+
+            // gaussian 向量
+            gaussianIdxStart = Math.Max(nBinsTolerance - freqIdx, 0);
+            gaussianIdxEnd = windowLen - Math.Max(freqIdx - (Constants.N_FREQ_BINS_CONTOURS - nBinsTolerance - 1), 0);
+            if (gaussianIdxStart >= freqGaussianSpan.Length || gaussianIdxEnd > freqGaussianSpan.Length)
+            {
+                throw new Exception($"GetPitchBend faild, guassian idx error: [{gaussianIdxStart},{gaussianIdxEnd}] {freqGaussianSpan.Length}");
+            }
+
+            //将子矩阵拆成行向量，和 gaussian 进行星乘运算
+            bends.Clear();
+            pbShift = -(float)(nBinsTolerance - Math.Max(0, nBinsTolerance - freqIdx));
+            for (int i = 0; i < rows; ++i)
+            {
+                var start = (note.IStartTime + i) * contourStep + freqStartIdx;
+                mulLength = Math.Min(cols, gaussianIdxEnd - gaussianIdxStart);
+                var pstart = contourSpan.Slice(start, mulLength);
+                var gaussianStart = freqGaussianSpan.Slice(gaussianIdxStart, mulLength);
+                TP.Multiply(pstart, gaussianStart, pitchBendSubMatrix);
+                // 求1个 bend
+                maxIdx = TP.IndexOfMax(pitchBendSubMatrix.AsSpan().Slice(0, mulLength));
+                maxValue = pitchBendSubMatrix[maxIdx];
+                bends.Add((float)maxIdx);
+            }
+            if (bends.Count > 0)
+            {
+                note.PitchBend = bends.ToArray();
+                TP.Add(note.PitchBend!, pbShift, note.PitchBend!);
+            }
+        }
     }
 
     private IList<Note> ToNoteList(in IList<InterNote> notes)
