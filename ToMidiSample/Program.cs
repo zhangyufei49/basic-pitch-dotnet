@@ -1,5 +1,6 @@
 ﻿using BasicPitch;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace ToMidiSample;
 
@@ -7,16 +8,15 @@ class Program
 {
     static void Main(string[] args)
     {
-        if (args.Length == 0)
+        var pargs = new ArgsParser(args);
+        if (pargs.AudioPath.Length == 0)
         {
-            // 获取当前进程
-            var processName = Process.GetCurrentProcess().MainModule?.FileName ?? "ToMidiSample";
-            Log($"Usage: {processName} <audio file path>");
+            ArgsParser.Help();
             return;
         }
 
         // 加载音频
-        var audioFile = args[0];
+        var audioFile = pargs.AudioPath;
         Log($"Load audio file: ${audioFile}");
         AudioReader reader;
         try
@@ -39,27 +39,26 @@ class Program
 
         // 进行预测
         Log("Predicting");
-        Stopwatch sw = Stopwatch.StartNew();
         var modelOutput = model.Predict(audioBuffer, (double p) =>
         {
             Log($"====> prediction progress: {p}", ConsoleColor.DarkYellow);
         });
-        sw.Stop();
-        Console.WriteLine($"predicting time used: {sw.ElapsedMilliseconds}ms");
 
         // 生成音符
-        Log("Convert to notes");
+        Log("Convert to notes with options:");
+        ShowOpts(pargs.NotesOpt);
         var notesConverter = new NotesConverter(modelOutput);
-        sw = Stopwatch.StartNew();
-        var notes = notesConverter.Convert(new NotesConvertOptions(IncludePitchBends: false));
-        sw.Stop();
-        Console.WriteLine($"convert time used: {sw.ElapsedMilliseconds}ms");
+        var notes = notesConverter.Convert(pargs.NotesOpt);
         foreach (var note in notes)
         {
             Log(note.ToString(), ConsoleColor.DarkYellow);
         }
 
-        Log("Save MIDI");
+        if (pargs.MidiPath.Length > 0)
+        {
+            Log($"Save MIDI to path [{pargs.MidiPath}] with options:");
+            ShowOpts(pargs.MidiOpt);
+        }
     }
 
     private static void Log(string msg, ConsoleColor color = ConsoleColor.DarkGreen)
@@ -67,5 +66,19 @@ class Program
         Console.ForegroundColor = color;
         Console.WriteLine(msg);
         Console.ForegroundColor = ConsoleColor.Gray;
+    }
+
+    private static void ShowOpts<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(T opt)
+    {
+        // 获取结构体的所有字段
+        FieldInfo[] fields = typeof(T).GetFields();
+
+        // 打印字段名称和值
+        Log("{", ConsoleColor.DarkMagenta);
+        foreach (FieldInfo field in fields)
+        {
+            Log($"  {field.Name}: {field.GetValue(opt)}", ConsoleColor.Magenta);
+        }
+        Log("}", ConsoleColor.DarkMagenta);
     }
 }

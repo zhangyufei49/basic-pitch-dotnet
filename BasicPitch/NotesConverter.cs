@@ -4,17 +4,20 @@ namespace BasicPitch;
 
 using TP = TensorPrimitives;
 
-public record struct NotesConvertOptions(
-    float OnsetThreshold = 0.5f, // 分割 - 合并 音符的力度 [0.05, 0.95]
-    float FrameThreshold = 0.3f, // 多 - 少 模型生成音符的置信度 [0.05, 0.95]
-    int MinNoteLength = 11, // 最短音符时长限制 [3, 50] ms
-    int EnergyThreshold = 11, // 能量限制
-    float? MinFreq = null, // 音调下限 [0, 2000] Hz
-    float? MaxFreq = null, // 音调上限 [40, 3000] Hz
-    bool InferOnsets = true, // 是否通过后处理算法生成音符
-    bool IncludePitchBends = true, // 弯音检测
-    bool MelodiaTrick = true // 泛音检测
-    );
+public record struct NotesConvertOptions
+{
+    public float OnsetThreshold = 0.5f; // 分割 - 合并 音符的力度 [0.05, 0.95]
+    public float FrameThreshold = 0.3f; // 多 - 少 模型生成音符的置信度 [0.05, 0.95]
+    public int MinNoteLength = 11; // 最短音符时长限制 [3, 50] ms
+    public int EnergyThreshold = 11; // 能量限制
+    public float? MinFreq = null; // 音调下限 [0, 2000] Hz
+    public float? MaxFreq = null; // 音调上限 [40, 3000] Hz
+    public bool InferOnsets = true; // 是否通过后处理算法生成音符
+    public bool IncludePitchBends = true; // 弯音检测
+    public bool MelodiaTrick = true; // 泛音检测
+
+    public NotesConvertOptions() { }
+}
 
 public class NotesConverter
 {

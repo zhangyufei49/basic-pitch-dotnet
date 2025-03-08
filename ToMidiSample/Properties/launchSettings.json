@@ -2,7 +2,7 @@
   "profiles": {
     "ToMidiSample": {
       "commandName": "Project",
-      "commandLineArgs": "$(ProjectDir)\\res\\flute.wav"
+      "commandLineArgs": "-a $(ProjectDir)\\res\\flute.wav"
     }
   }
 }
