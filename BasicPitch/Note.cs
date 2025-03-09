@@ -6,7 +6,7 @@ public sealed class Note : IComparable<Note>
     public readonly float EndTime;
     public readonly int Pitch;
     public readonly float Amplitude;
-    public readonly float[]? PitchBend;
+    public float[]? PitchBend;
 
     public Note(float startTime, float endTime, int pitch, float amplitude, float[]? pitchBend)
     {

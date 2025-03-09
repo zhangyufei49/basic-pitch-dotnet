@@ -2,7 +2,7 @@
   "profiles": {
     "ToMidiSample": {
       "commandName": "Project",
-      "commandLineArgs": "-a $(ProjectDir)\\res\\flute.wav"
+      "commandLineArgs": "-a $(ProjectDir)res\\flute.wav -m $(TargetDir)output.mid --pitch_bend true"
     }
   }
 }

@@ -1,4 +1,5 @@
 ﻿using BasicPitch;
+using NAudio.Midi;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -58,6 +59,9 @@ class Program
         {
             Log($"Save MIDI to path [{pargs.MidiPath}] with options:");
             ShowOpts(pargs.MidiOpt);
+            var writer = new MidiWriter(notes);
+            var events = writer.Write(pargs.MidiOpt);
+            MidiFile.Export(pargs.MidiPath, events);
         }
     }
 

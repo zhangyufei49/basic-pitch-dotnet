@@ -28,7 +28,7 @@ public class NotesConverter
         this.input = input;
     }
 
-    public IList<Note> Convert(NotesConvertOptions opt)
+    public List<Note> Convert(NotesConvertOptions opt)
     {
         var notes = ToNotesPolyphonic(opt);
         if (opt.IncludePitchBends)
@@ -39,7 +39,7 @@ public class NotesConverter
     }
 
     // 将模型识别数据转换为复音音符
-    private IList<InterNote> ToNotesPolyphonic(NotesConvertOptions opt)
+    private List<InterNote> ToNotesPolyphonic(NotesConvertOptions opt)
     {
         var (onsets, frames) = NotesHelper.ConstrainFrequency(input.Onsets, input.Notes, opt.MaxFreq, opt.MinFreq);
         if (opt.InferOnsets)
@@ -213,7 +213,7 @@ public class NotesConverter
         return notes;
     }
 
-    private void GetPitchBend(ref IList<InterNote> notes, int nBinsTolerance = 25)
+    private void GetPitchBend(ref List<InterNote> notes, int nBinsTolerance = 25)
     {
         if (input.Contours.Data == null || notes.Count == 0) return;
         var contourSpan = input.Contours.Data!.AsSpan();
@@ -280,7 +280,7 @@ public class NotesConverter
         }
     }
 
-    private IList<Note> ToNoteList(in IList<InterNote> notes)
+    private List<Note> ToNoteList(in List<InterNote> notes)
     {
         if (notes.Count == 0 || input.Contours.Shape == null)
         {
