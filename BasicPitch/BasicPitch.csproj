@@ -2,12 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
+    <Version>1.0.1</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Authors>zhangyufei49@gmail.com</Authors>
+    <Authors>zhangyufei49</Authors>
     <Company />
     <PackageProjectUrl>https://github.com/zhangyufei49/basic-pitch-dotnet</PackageProjectUrl>
     <RepositoryUrl>https://github.com/zhangyufei49/basic-pitch-dotnet</RepositoryUrl>
+    <Description>
+      https://basicpitch.spotify.com/ is a audio-to-MIDI converter, built by Spotify.
+      It is developed by Python, and this project is it's dotnet port.
+    </Description>
+    <Title>basic-pitch-dotnet</Title>
+    <Copyright>https://github.com/zhangyufei49/basic-pitch-dotnet</Copyright>
+    <PackageTags>audio,midi</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -27,6 +36,13 @@
 
   <ItemGroup>
     <EmbeddedResource Include="nmp.onnx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
