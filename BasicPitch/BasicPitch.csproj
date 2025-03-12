@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Authors>zhangyufei49</Authors>
@@ -17,6 +17,8 @@
     <Copyright>https://github.com/zhangyufei49/basic-pitch-dotnet</Copyright>
     <PackageTags>audio,midi</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.en.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -39,7 +41,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\doc\icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\doc\README.en.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

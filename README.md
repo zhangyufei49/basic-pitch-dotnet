@@ -1,4 +1,4 @@
-[English](./README.en.md)
+[English](./doc/README.en.md)
 
 ## basic-pitch-dotnet
 
